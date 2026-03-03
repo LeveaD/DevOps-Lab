@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Issue Books — Book Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.issue-form-wrapper {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 1.5rem;
+}
+.issue-form-card {
+  background: var(--navy-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  position: sticky;
+  top: 1rem;
+  height: fit-content;
+}
+.issue-form-card-header {
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04));
+  border-bottom: 1px solid var(--border);
+  padding: 1.2rem 1.5rem;
+}
+.issue-form-card-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cream);
+}
+.issue-form-body { padding: 1.5rem; }
+
+/* Preview card */
+.preview-card {
+  background: var(--navy-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.preview-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.preview-name { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--cream); }
+.preview-sub { font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem; color: var(--gold-dim); letter-spacing: 0.05em; margin-top: 2px; }
+
+/* Issue history table */
+.overdue-row td { color: var(--red) !important; }
+.overdue-row { background: rgba(201,76,76,0.04) !important; }
+
+/* Fine calculator */
+.fine-calc {
+  background: rgba(201,76,76,0.06);
+  border: 1px solid rgba(201,76,76,0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+.fine-calc h4 {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.75rem;
+}
+.fine-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  font-size: 0.88rem;
+  color: var(--cream-dim);
+  border-bottom: 1px dashed rgba(201,76,76,0.1);
+}
+.fine-row:last-child { border-bottom: none; font-weight: 600; color: var(--red); }
+.fine-row span { font-family: 'Josefin Sans', sans-serif; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📚</div>
+      <div>
+        <div class="brand-name">Book Bank</div>
+        <div class="brand-sub">Academic Library</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-name">Dr. Admin</div>
+      <div class="user-role">Head Librarian</div>
+      <div class="role-badge">Administrator</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Overview</div>
+      <a href="dashboard.html"><span class="nav-icon">⬡</span> Dashboard</a>
+      <div class="nav-section-title">Catalogue</div>
+      <a href="books.html"><span class="nav-icon">📖</span> Books <span class="nav-badge">1248</span></a>
+      <a href="students.html"><span class="nav-icon">🎓</span> Students</a>
+      <div class="nav-section-title">Transactions</div>
+      <a href="issue.html" class="active"><span class="nav-icon">↗</span> Issue Books</a>
+      <a href="reservations.html"><span class="nav-icon">◷</span> Reservations <span class="nav-badge">7</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html">⬡ &nbsp; Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="page-header fade-up fade-up-1">
+      <div>
+        <div class="page-subtitle">Transactions</div>
+        <h1 class="page-title">Issue <em>Books</em></h1>
+        <div class="page-date js-date"></div>
+      </div>
+    </div>
+
+    <!-- Stat row -->
+    <div class="stats-grid fade-up fade-up-2" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem">
+      <div class="stat-card">
+        <span class="stat-icon">↗</span>
+        <div class="stat-value" data-count="86">0</div>
+        <div class="stat-label">Active Issues</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">↩</span>
+        <div class="stat-value" data-count="24">0</div>
+        <div class="stat-label">Returned Today</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">⚠</span>
+        <div class="stat-value" data-count="3">0</div>
+        <div class="stat-label">Overdue</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💰</span>
+        <div class="stat-value" data-count="460">0</div>
+        <div class="stat-label">Fines (₹)</div>
+      </div>
+    </div>
+
+    <div class="issue-form-wrapper fade-up fade-up-3">
+
+      <!-- ISSUE FORM -->
+      <div>
+        <div class="issue-form-card" style="margin-bottom:1.2rem">
+          <div class="issue-form-card-header">
+            <h2>↗ &nbsp;Issue a Book</h2>
+          </div>
+          <div class="issue-form-body">
+            <div class="form-group">
+              <label class="form-label">Student ID</label>
+              <input class="form-control" type="text" id="inp-student-id" placeholder="e.g. 311123104068" oninput="lookupStudent()">
+              <div id="student-preview" style="display:none;margin-top:0.5rem">
+                <div class="preview-card">
+                  <div class="preview-icon">🎓</div>
+                  <div>
+                    <div class="preview-name" id="prev-student-name">—</div>
+                    <div class="preview-sub" id="prev-student-info">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Book ID</label>
+              <input class="form-control" type="text" id="inp-book-id" placeholder="e.g. BK-001" oninput="lookupBook()">
+              <div id="book-preview" style="display:none;margin-top:0.5rem">
+                <div class="preview-card">
+                  <div class="preview-icon">📖</div>
+                  <div>
+                    <div class="preview-name" id="prev-book-name">—</div>
+                    <div class="preview-sub" id="prev-book-info">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+              <div class="form-group">
+                <label class="form-label">Issue Date</label>
+                <input class="form-control" type="date" id="inp-issue-date">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Return Date</label>
+                <input class="form-control" type="date" id="inp-return-date">
+              </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:0.8rem" onclick="issueBook()">
+              ↗ &nbsp;Issue Book
+            </button>
+          </div>
+        </div>
+
+        <!-- FINE CALCULATOR -->
+        <div class="issue-form-card">
+          <div class="issue-form-card-header">
+            <h2>⚠ &nbsp;Fine Calculator</h2>
+          </div>
+          <div class="issue-form-body">
+            <div class="form-group">
+              <label class="form-label">Issue ID</label>
+              <input class="form-control" type="text" placeholder="Enter Issue ID" oninput="calcFine(this.value)">
+            </div>
+            <div class="fine-calc" id="fine-result" style="display:none">
+              <h4>Fine Breakdown</h4>
+              <div class="fine-row"><span>Issue Date</span><span>Jan 10, 2026</span></div>
+              <div class="fine-row"><span>Due Date</span><span>Feb 10, 2026</span></div>
+              <div class="fine-row"><span>Today</span><span class="js-date"></span></div>
+              <div class="fine-row"><span>Days Overdue</span><span>21 days</span></div>
+              <div class="fine-row"><span>Rate</span><span>₹2 / day</span></div>
+              <div class="fine-row"><span>Total Fine</span><span style="color:var(--red)">₹42</span></div>
+            </div>
+            <button class="btn btn-danger" style="width:100%;justify-content:center;margin-top:0.5rem" onclick="showToast('Fine of ₹42 applied','Lumena U — Computer Networks','⚠')">Apply Fine</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ISSUE LOG TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Issue <span class="accent">Log</span></div>
+          <div class="search-wrap" style="max-width:220px">
+            <span class="search-icon">⌕</span>
+            <input type="text" placeholder="Search issues..." oninput="filterIssues(this.value)">
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Issue ID</th>
+                <th>Student</th>
+                <th>Book</th>
+                <th>Issue Date</th>
+                <th>Return Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="issue-tbody">
+              <tr>
+                <td>ISS-001</td>
+                <td>Levea Deroshen S</td>
+                <td>DBMS</td>
+                <td>Jan 15</td>
+                <td>Feb 15</td>
+                <td><span class="badge badge-issued">Issued</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Book returned','ISS-001 closed','✦')">Return</button></td>
+              </tr>
+              <tr>
+                <td>ISS-002</td>
+                <td>Lourdh Sanya C</td>
+                <td>OS Concepts</td>
+                <td>Jan 18</td>
+                <td>Feb 18</td>
+                <td><span class="badge badge-issued">Issued</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Book returned','ISS-002 closed','✦')">Return</button></td>
+              </tr>
+              <tr class="overdue-row">
+                <td>ISS-003</td>
+                <td>Lumena U</td>
+                <td>Networks</td>
+                <td>Jan 10</td>
+                <td>Feb 10</td>
+                <td><span class="badge badge-overdue">Overdue</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="document.getElementById('fine-result').style.display='block';showToast('Fine calculated','₹42 applied','⚠')">Fine</button></td>
+              </tr>
+              <tr>
+                <td>ISS-004</td>
+                <td>Mahesh Bharathi K</td>
+                <td>Software Engg.</td>
+                <td>Jan 22</td>
+                <td>Feb 22</td>
+                <td><span class="badge badge-issued">Issued</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Book returned','ISS-004 closed','✦')">Return</button></td>
+              </tr>
+              <tr>
+                <td>ISS-005</td>
+                <td>Priya S</td>
+                <td>DSA Cormen</td>
+                <td>Feb 01</td>
+                <td>Mar 01</td>
+                <td><span class="badge badge-issued">Issued</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Book returned','ISS-005 closed','✦')">Return</button></td>
+              </tr>
+              <tr>
+                <td>ISS-006</td>
+                <td>Arjun Kumar R</td>
+                <td>AI: Russell</td>
+                <td>Jan 25</td>
+                <td>Feb 25</td>
+                <td><span class="badge badge-available">Returned</span></td>
+                <td><span style="font-family:'Josefin Sans',sans-serif;font-size:0.6rem;color:var(--cream-dim)">Done</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon">✦</span>
+  <div>
+    <div class="toast-msg">Done</div>
+    <div class="toast-sub"></div>
+  </div>
+</div>
+
+<script src="js/shared.js"></script>
+<script>
+const studentDB = {
+  '311123104068': { name: 'Levea Deroshen S', info: '23CS142 · Computer Science · II Year' },
+  '311123104069': { name: 'Lourdh Sanya C', info: '23CS143 · Computer Science · II Year' },
+  '311123104070': { name: 'Lumena U', info: '23CS144 · Computer Science · II Year' },
+  '311123104071': { name: 'Mahesh Bharathi K', info: '23CS103 · Computer Science · II Year' },
+};
+const bookDB = {
+  'BK-001': { name: 'Database Management Systems', info: 'Korth & Silberschatz · Available · 3 copies' },
+  'BK-002': { name: 'Operating System Concepts', info: 'Silberschatz & Galvin · Available · 1 copy' },
+  'BK-003': { name: 'Computer Networks', info: 'Andrew Tanenbaum · Available · 2 copies' },
+  'BK-004': { name: 'Software Engineering', info: 'Pressman & Maxim · Available · 4 copies' },
+};
+
+function lookupStudent() {
+  const v = document.getElementById('inp-student-id').value.trim();
+  const s = studentDB[v];
+  if (s) {
+    document.getElementById('prev-student-name').textContent = s.name;
+    document.getElementById('prev-student-info').textContent = s.info;
+    document.getElementById('student-preview').style.display = 'block';
+  } else {
+    document.getElementById('student-preview').style.display = 'none';
+  }
+}
+
+function lookupBook() {
+  const v = document.getElementById('inp-book-id').value.trim().toUpperCase();
+  const b = bookDB[v];
+  if (b) {
+    document.getElementById('prev-book-name').textContent = b.name;
+    document.getElementById('prev-book-info').textContent = b.info;
+    document.getElementById('book-preview').style.display = 'block';
+  } else {
+    document.getElementById('book-preview').style.display = 'none';
+  }
+}
+
+function issueBook() {
+  showToast('Book issued successfully', 'Issue record created', '↗');
+  document.getElementById('inp-student-id').value = '';
+  document.getElementById('inp-book-id').value = '';
+  document.getElementById('student-preview').style.display = 'none';
+  document.getElementById('book-preview').style.display = 'none';
+}
+
+function calcFine(v) {
+  document.getElementById('fine-result').style.display = v.length >= 6 ? 'block' : 'none';
+}
+
+// Set today's date defaults
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  const ret = new Date(today);
+  ret.setDate(ret.getDate() + 30);
+  document.getElementById('inp-issue-date').value = fmt(today);
+  document.getElementById('inp-return-date').value = fmt(ret);
+});
+</script>
+</body>
+</html>

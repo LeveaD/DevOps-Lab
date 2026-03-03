@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Books — Book Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.2rem;
+  background: var(--navy-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.filter-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.chip {
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  color: var(--cream-dim);
+  transition: all 0.2s;
+  background: transparent;
+}
+.chip.active, .chip:hover {
+  border-color: var(--gold);
+  color: var(--gold-light);
+  background: rgba(201,168,76,0.1);
+}
+
+/* Book Cards Grid */
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+.book-card {
+  background: var(--navy-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  animation: fadeUp 0.5s ease forwards;
+  opacity: 0;
+}
+.book-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--gold-dim);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 20px rgba(201,168,76,0.1);
+}
+.book-cover {
+  height: 160px;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+.book-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.6) 100%);
+}
+.book-cover-id {
+  position: absolute;
+  top: 0.7rem; right: 0.8rem;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.6);
+  background: rgba(0,0,0,0.3);
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.book-cover-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 0.7rem;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.3;
+}
+.book-info { padding: 1rem; }
+.book-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
+}
+.book-author {
+  font-size: 0.8rem;
+  color: var(--cream-dim);
+  font-style: italic;
+  margin-bottom: 0.6rem;
+}
+.book-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+}
+.book-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+
+/* Table view toggle */
+.view-toggle { display: flex; gap: 0.5rem; }
+.view-btn {
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--cream-dim);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.view-btn.active { border-color: var(--gold-dim); color: var(--gold); background: rgba(201,168,76,0.1); }
+
+/* Table view */
+.table-view { display: none; }
+.table-view.active { display: block; }
+.grid-view { display: grid; }
+.grid-view.hidden { display: none; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(15px); }
+  to { opacity:1; transform:translateY(0); }
+}
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📚</div>
+      <div>
+        <div class="brand-name">Book Bank</div>
+        <div class="brand-sub">Academic Library</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-name">Dr. Admin</div>
+      <div class="user-role">Head Librarian</div>
+      <div class="role-badge">Administrator</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Overview</div>
+      <a href="dashboard.html"><span class="nav-icon">⬡</span> Dashboard</a>
+      <div class="nav-section-title">Catalogue</div>
+      <a href="books.html" class="active"><span class="nav-icon">📖</span> Books <span class="nav-badge">1248</span></a>
+      <a href="students.html"><span class="nav-icon">🎓</span> Students</a>
+      <div class="nav-section-title">Transactions</div>
+      <a href="issue.html"><span class="nav-icon">↗</span> Issue Books</a>
+      <a href="reservations.html"><span class="nav-icon">◷</span> Reservations <span class="nav-badge">7</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html">⬡ &nbsp; Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="page-header fade-up fade-up-1">
+      <div>
+        <div class="page-subtitle">Catalogue</div>
+        <h1 class="page-title">Book <em>Collection</em></h1>
+        <div class="page-date js-date"></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center">
+        <div class="view-toggle">
+          <button class="view-btn active" id="btn-grid" onclick="setView('grid')">⊞</button>
+          <button class="view-btn" id="btn-table" onclick="setView('table')">☰</button>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-book')">+ Add Book</button>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar fade-up fade-up-2">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" placeholder="Search books, authors..." id="search-input" oninput="filterBooks()">
+      </div>
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all" onclick="setFilter(this,'all')">All</button>
+        <button class="chip" data-filter="available" onclick="setFilter(this,'available')">Available</button>
+        <button class="chip" data-filter="issued" onclick="setFilter(this,'issued')">Issued</button>
+        <button class="chip" data-filter="reserved" onclick="setFilter(this,'reserved')">Reserved</button>
+      </div>
+      <div style="margin-left:auto;font-family:'Josefin Sans',sans-serif;font-size:0.68rem;color:var(--cream-dim);letter-spacing:0.05em">
+        Showing <span id="count-label">12</span> books
+      </div>
+    </div>
+
+    <!-- BOOKS GRID VIEW -->
+    <div class="books-grid grid-view" id="books-grid"></div>
+
+    <!-- TABLE VIEW -->
+    <div class="table-view card fade-up fade-up-3" id="books-table-wrap">
+      <div class="card-header">
+        <div class="card-title">Book <span class="accent">Catalogue</span></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="books-table">
+          <thead>
+            <tr>
+              <th>Book ID</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="books-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD BOOK MODAL -->
+<div class="modal-overlay" id="modal-add-book">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Add New Book</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-book')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Book ID</label>
+      <input class="form-control" type="text" placeholder="e.g. BK-2026-049">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Book Title</label>
+      <input class="form-control" type="text" placeholder="Enter full book title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Author</label>
+      <input class="form-control" type="text" placeholder="Author name">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-control">
+          <option>Computer Science</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+          <option>Literature</option>
+          <option>Engineering</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Copies</label>
+        <input class="form-control" type="number" value="1" min="1">
+      </div>
+    </div>
+    <div style="display:flex;gap:0.75rem;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-book')">Cancel</button>
+      <button class="btn btn-primary" onclick="addBook()">Add to Catalogue</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOK DETAIL MODAL -->
+<div class="modal-overlay" id="modal-book-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="detail-title">Book Details</h3>
+      <button class="modal-close" onclick="closeModal('modal-book-detail')">✕</button>
+    </div>
+    <div id="detail-content"></div>
+    <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-book-detail')">Close</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-book-detail');openModal('modal-add-book');showToast('Edit mode','Modify book details','✎')">Edit</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon">✦</span>
+  <div>
+    <div class="toast-msg">Done</div>
+    <div class="toast-sub"></div>
+  </div>
+</div>
+
+<script src="js/shared.js"></script>
+<script>
+const coverColors = [
+  ['#1a2a4a','#c9a84c'],['#2a1a1a','#e8c96a'],['#1a2a1a','#4cad7e'],
+  ['#2a1a2a','#a09de8'],['#1a1a2a','#7aaee8'],['#2a2a1a','#c9a84c'],
+  ['#1a2a2a','#6a9a8a'],['#2a1a1a','#d08060'],['#1a1a1a','#c9a84c'],
+  ['#0a1020','#e8c96a'],['#201008','#c9a84c'],['#0a200a','#4cad7e'],
+];
+
+const books = [
+  { id:'BK-001', title:'Database Management Systems', author:'Korth & Silberschatz', cat:'Computer Science', status:'available', copies:3 },
+  { id:'BK-002', title:'Operating System Concepts', author:'Silberschatz & Galvin', cat:'Computer Science', status:'issued', copies:2 },
+  { id:'BK-003', title:'Computer Networks', author:'Andrew Tanenbaum', cat:'Computer Science', status:'reserved', copies:1 },
+  { id:'BK-004', title:'Software Engineering', author:'Pressman & Maxim', cat:'Engineering', status:'available', copies:4 },
+  { id:'BK-005', title:'Data Structures & Algorithms', author:'Cormen et al.', cat:'Computer Science', status:'issued', copies:3 },
+  { id:'BK-006', title:'Object Oriented Programming', author:'Grady Booch', cat:'Computer Science', status:'available', copies:2 },
+  { id:'BK-007', title:'Discrete Mathematics', author:'Kenneth Rosen', cat:'Mathematics', status:'available', copies:5 },
+  { id:'BK-008', title:'Engineering Physics', author:'R.K. Gaur', cat:'Physics', status:'reserved', copies:2 },
+  { id:'BK-009', title:'Compiler Design', author:'Aho, Lam, Sethi', cat:'Computer Science', status:'available', copies:3 },
+  { id:'BK-010', title:'Artificial Intelligence', author:'Russell & Norvig', cat:'Computer Science', status:'issued', copies:1 },
+  { id:'BK-011', title:'Machine Learning', author:'Tom Mitchell', cat:'Computer Science', status:'available', copies:2 },
+  { id:'BK-012', title:'Computer Organization', author:'Patterson & Hennessy', cat:'Engineering', status:'available', copies:4 },
+];
+
+let currentFilter = 'all';
+let currentView = 'grid';
+
+function statusBadge(s) {
+  const map = { available:'badge-available', issued:'badge-issued', reserved:'badge-reserved' };
+  return `<span class="badge ${map[s]}">${s}</span>`;
+}
+
+function renderGrid(list) {
+  const grid = document.getElementById('books-grid');
+  grid.innerHTML = '';
+  list.forEach((b, i) => {
+    const [bg, accent] = coverColors[i % coverColors.length];
+    const div = document.createElement('div');
+    div.className = 'book-card';
+    div.style.animationDelay = (i * 0.05) + 's';
+    div.innerHTML = `
+      <div class="book-cover" style="background:${bg}">
+        <div class="book-cover-id">${b.id}</div>
+        <div class="book-cover-icon" style="color:${accent};font-size:1.8rem;font-weight:900;font-family:'Playfair Display',serif;">${b.title.charAt(0)}</div>
+      </div>
+      <div class="book-info">
+        <div class="book-title">${b.title}</div>
+        <div class="book-author">${b.author}</div>
+        <div class="book-meta">
+          ${statusBadge(b.status)}
+          <span style="font-family:'Josefin Sans',sans-serif;font-size:0.6rem;color:var(--cream-dim);letter-spacing:0.05em">${b.copies} copies</span>
+        </div>
+        <div class="book-actions">
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="viewBook(${i})">Details</button>
+          ${b.status==='available'?`<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();showToast('Issue initiated','Select student to proceed','↗')">Issue</button>`:''}
+        </div>
+      </div>`;
+    grid.appendChild(div);
+  });
+  document.getElementById('count-label').textContent = list.length;
+}
+
+function renderTable(list) {
+  const tbody = document.getElementById('books-tbody');
+  tbody.innerHTML = list.map(b => `
+    <tr>
+      <td>${b.id}</td>
+      <td>${b.title}</td>
+      <td style="font-style:italic">${b.author}</td>
+      <td><span style="font-family:'Josefin Sans',sans-serif;font-size:0.68rem;color:var(--cream-dim)">${b.cat}</span></td>
+      <td>${statusBadge(b.status)}</td>
+      <td>
+        <div style="display:flex;gap:0.4rem">
+          <button class="btn btn-ghost btn-sm">Edit</button>
+          ${b.status==='available'?`<button class="btn btn-primary btn-sm" onclick="showToast('Issue initiated','','↗')">Issue</button>`:''}
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('count-label').textContent = list.length;
+}
+
+function getFiltered() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  return books.filter(b => {
+    const matchFilter = currentFilter === 'all' || b.status === currentFilter;
+    const matchSearch = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q) || b.id.toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  });
+}
+
+function filterBooks() {
+  const list = getFiltered();
+  renderGrid(list);
+  renderTable(list);
+}
+
+function setFilter(el, filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  filterBooks();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('btn-grid').classList.toggle('active', v === 'grid');
+  document.getElementById('btn-table').classList.toggle('active', v === 'table');
+  document.getElementById('books-grid').classList.toggle('hidden', v !== 'grid');
+  document.getElementById('books-grid').style.display = v === 'grid' ? 'grid' : 'none';
+  document.getElementById('books-table-wrap').classList.toggle('table-view', true);
+  document.getElementById('books-table-wrap').style.display = v === 'table' ? 'block' : 'none';
+}
+
+function viewBook(i) {
+  const b = books[i];
+  document.getElementById('detail-title').textContent = b.title;
+  document.getElementById('detail-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div><div class="form-label">Book ID</div><div style="color:var(--cream)">${b.id}</div></div>
+      <div><div class="form-label">Category</div><div style="color:var(--cream)">${b.cat}</div></div>
+      <div><div class="form-label">Author</div><div style="color:var(--cream);font-style:italic">${b.author}</div></div>
+      <div><div class="form-label">Copies</div><div style="color:var(--cream)">${b.copies}</div></div>
+      <div><div class="form-label">Status</div>${statusBadge(b.status)}</div>
+    </div>`;
+  openModal('modal-book-detail');
+}
+
+function addBook() {
+  closeModal('modal-add-book');
+  showToast('Book added to catalogue', 'Inventory updated', '✦');
+}
+
+// init
+setView('grid');
+filterBooks();
+document.getElementById('books-table-wrap').style.display = 'none';
+</script>
+</body>
+</html>

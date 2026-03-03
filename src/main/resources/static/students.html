@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Students — Book Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.student-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 1.2rem;
+}
+.student-card {
+  background: var(--navy-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  transition: transform 0.3s, border-color 0.3s;
+  animation: fadeUp 0.4s ease forwards;
+  opacity: 0;
+}
+.student-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold-dim);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+.student-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--navy);
+  flex-shrink: 0;
+}
+.student-card-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.student-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1.2;
+}
+.student-id {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--gold-dim);
+  margin-top: 2px;
+}
+.student-stats {
+  display: flex;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.student-stat { text-align: center; flex: 1; }
+.student-stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+.student-stat-lbl {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  margin-top: 2px;
+}
+.student-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.2rem;
+  background: var(--navy-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📚</div>
+      <div>
+        <div class="brand-name">Book Bank</div>
+        <div class="brand-sub">Academic Library</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-name">Dr. Admin</div>
+      <div class="user-role">Head Librarian</div>
+      <div class="role-badge">Administrator</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Overview</div>
+      <a href="dashboard.html"><span class="nav-icon">⬡</span> Dashboard</a>
+      <div class="nav-section-title">Catalogue</div>
+      <a href="books.html"><span class="nav-icon">📖</span> Books <span class="nav-badge">1248</span></a>
+      <a href="students.html" class="active"><span class="nav-icon">🎓</span> Students</a>
+      <div class="nav-section-title">Transactions</div>
+      <a href="issue.html"><span class="nav-icon">↗</span> Issue Books</a>
+      <a href="reservations.html"><span class="nav-icon">◷</span> Reservations <span class="nav-badge">7</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html">⬡ &nbsp; Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="page-header fade-up fade-up-1">
+      <div>
+        <div class="page-subtitle">Catalogue</div>
+        <h1 class="page-title">Student <em>Directory</em></h1>
+        <div class="page-date js-date"></div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-add-student')">+ Register Student</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid fade-up fade-up-2" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem">
+      <div class="stat-card">
+        <span class="stat-icon">🎓</span>
+        <div class="stat-value" data-count="342">0</div>
+        <div class="stat-label">Total Students</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📖</span>
+        <div class="stat-value" data-count="86">0</div>
+        <div class="stat-label">Active Issues</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">⚠</span>
+        <div class="stat-value" data-count="3">0</div>
+        <div class="stat-label">Overdue</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💰</span>
+        <div class="stat-value" data-count="420">0</div>
+        <div class="stat-label">Fines Pending (₹)</div>
+      </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-bar fade-up fade-up-2">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" placeholder="Search students..." id="search-input" oninput="filterStudents()">
+      </div>
+      <select class="form-control" style="width:auto;padding:0.45rem 0.9rem;font-size:0.78rem" onchange="filterStudents()">
+        <option value="">All Sections</option>
+        <option>23CS</option>
+        <option>23EC</option>
+        <option>23ME</option>
+      </select>
+      <div style="margin-left:auto;font-family:'Josefin Sans',sans-serif;font-size:0.68rem;color:var(--cream-dim)">
+        <span id="count-lbl">8</span> students
+      </div>
+    </div>
+
+    <!-- Student Cards -->
+    <div class="student-grid" id="student-grid"></div>
+
+  </main>
+</div>
+
+<!-- ADD STUDENT MODAL -->
+<div class="modal-overlay" id="modal-add-student">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Register New Student</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-student')">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="form-group">
+        <label class="form-label">Student ID</label>
+        <input class="form-control" type="text" placeholder="311123104xxx">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Roll Number</label>
+        <input class="form-control" type="text" placeholder="23CSxxx">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input class="form-control" type="text" placeholder="Student full name">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="form-group">
+        <label class="form-label">Department</label>
+        <select class="form-control">
+          <option>Computer Science</option>
+          <option>Electronics</option>
+          <option>Mechanical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Year</label>
+        <select class="form-control">
+          <option>I Year</option>
+          <option>II Year</option>
+          <option>III Year</option>
+          <option>IV Year</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input class="form-control" type="text" placeholder="Login username">
+    </div>
+    <div style="display:flex;gap:0.75rem;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-student')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-add-student');showToast('Student registered','Account created','🎓')">Register</button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT DETAIL MODAL -->
+<div class="modal-overlay" id="modal-student-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="s-detail-name">Student Details</h3>
+      <button class="modal-close" onclick="closeModal('modal-student-detail')">✕</button>
+    </div>
+    <div id="s-detail-content"></div>
+    <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.5rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-student-detail')">Close</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-student-detail');openModal('modal-add-student')">Edit</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon">✦</span>
+  <div>
+    <div class="toast-msg">Done</div>
+    <div class="toast-sub"></div>
+  </div>
+</div>
+
+<script src="js/shared.js"></script>
+<script>
+const students = [
+  { id:'311123104068', roll:'23CS142', name:'Levea Deroshen S', dept:'Computer Science', year:'II', issued:2, fine:0, status:'active' },
+  { id:'311123104069', roll:'23CS143', name:'Lourdh Sanya C', dept:'Computer Science', year:'II', issued:1, fine:0, status:'active' },
+  { id:'311123104070', roll:'23CS144', name:'Lumena U', dept:'Computer Science', year:'II', issued:1, fine:20, status:'overdue' },
+  { id:'311123104071', roll:'23CS103', name:'Mahesh Bharathi K', dept:'Computer Science', year:'II', issued:3, fine:0, status:'active' },
+  { id:'311123104072', roll:'23CS105', name:'Priya S', dept:'Computer Science', year:'II', issued:2, fine:0, status:'active' },
+  { id:'311123104073', roll:'23CS110', name:'Rajan K', dept:'Computer Science', year:'II', issued:0, fine:0, status:'active' },
+  { id:'311123104074', roll:'23CS115', name:'Arjun Kumar R', dept:'Computer Science', year:'II', issued:1, fine:0, status:'active' },
+  { id:'311123104075', roll:'23CS120', name:'Divya M', dept:'Computer Science', year:'II', issued:2, fine:40, status:'overdue' },
+];
+
+const avatarColors = ['#c9a84c','#4cad7e','#a09de8','#7aaee8','#d08060','#c94c4c','#50a050','#c9a84c'];
+
+function renderStudents(list) {
+  const grid = document.getElementById('student-grid');
+  grid.innerHTML = '';
+  list.forEach((s, i) => {
+    const initials = s.name.split(' ').map(n=>n[0]).join('').slice(0,2);
+    const col = avatarColors[i % avatarColors.length];
+    const div = document.createElement('div');
+    div.className = 'student-card';
+    div.style.animationDelay = (i * 0.06) + 's';
+    div.innerHTML = `
+      <div class="student-card-top">
+        <div class="student-avatar" style="background:${col}">${initials}</div>
+        <div>
+          <div class="student-name">${s.name}</div>
+          <div class="student-id">${s.roll} · ${s.id}</div>
+          ${s.status==='overdue'?`<span class="badge badge-overdue" style="margin-top:4px">Overdue</span>`:`<span class="badge badge-available" style="margin-top:4px">Active</span>`}
+        </div>
+      </div>
+      <div class="student-stats">
+        <div class="student-stat">
+          <div class="student-stat-val">${s.issued}</div>
+          <div class="student-stat-lbl">Issued</div>
+        </div>
+        <div class="student-stat">
+          <div class="student-stat-val" style="${s.fine>0?'color:var(--red)':''}">₹${s.fine}</div>
+          <div class="student-stat-lbl">Fine</div>
+        </div>
+        <div class="student-stat">
+          <div class="student-stat-val">${s.dept.split(' ')[0]}</div>
+          <div class="student-stat-lbl">Dept</div>
+        </div>
+      </div>
+      <div class="student-actions">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="viewStudent(${i})">View Profile</button>
+        ${s.fine>0?`<button class="btn btn-danger btn-sm" onclick="showToast('Fine cleared','₹${s.fine} collected','💰')">Clear Fine</button>`:''}
+      </div>`;
+    grid.appendChild(div);
+  });
+  document.getElementById('count-lbl').textContent = list.length;
+}
+
+function filterStudents() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const list = students.filter(s =>
+    !q || s.name.toLowerCase().includes(q) || s.roll.toLowerCase().includes(q) || s.id.includes(q)
+  );
+  renderStudents(list);
+}
+
+function viewStudent(i) {
+  const s = students[i];
+  document.getElementById('s-detail-name').textContent = s.name;
+  document.getElementById('s-detail-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div><div class="form-label">Student ID</div><div style="color:var(--cream)">${s.id}</div></div>
+      <div><div class="form-label">Roll Number</div><div style="color:var(--cream)">${s.roll}</div></div>
+      <div><div class="form-label">Department</div><div style="color:var(--cream)">${s.dept}</div></div>
+      <div><div class="form-label">Year</div><div style="color:var(--cream)">${s.year} Year</div></div>
+      <div><div class="form-label">Books Issued</div><div style="color:var(--gold);font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700">${s.issued}</div></div>
+      <div><div class="form-label">Fine Due</div><div style="color:${s.fine>0?'var(--red)':'var(--green)'};font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700">₹${s.fine}</div></div>
+    </div>
+    <div style="margin-top:1rem">
+      <div class="form-label">Status</div>
+      ${s.status==='overdue'?`<span class="badge badge-overdue">Overdue</span>`:`<span class="badge badge-available">Active</span>`}
+    </div>`;
+  openModal('modal-student-detail');
+}
+
+renderStudents(students);
+</script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reservations — Book Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.reservation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.2rem;
+}
+.res-card {
+  background: var(--navy-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  animation: fadeUp 0.4s ease forwards;
+  opacity: 0;
+  transition: transform 0.3s, border-color 0.3s;
+}
+.res-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(160,157,232,0.4);
+}
+.res-card-top {
+  background: linear-gradient(135deg, rgba(160,157,232,0.1), rgba(160,157,232,0.03));
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.res-id {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a09de8;
+}
+.res-body { padding: 1.2rem 1.5rem; }
+.res-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  font-size: 0.88rem;
+  border-bottom: 1px dashed rgba(201,168,76,0.08);
+}
+.res-field:last-child { border-bottom: none; }
+.res-field-lbl { font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold-dim); }
+.res-field-val { color: var(--cream); font-weight: 600; }
+.res-actions { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 2rem; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem; top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--gold-dim), transparent);
+}
+.tl-item {
+  position: relative;
+  padding: 0 0 1.5rem 1rem;
+}
+.tl-dot {
+  position: absolute;
+  left: -1.55rem;
+  top: 0.3rem;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim);
+  background: var(--navy);
+}
+.tl-dot.filled { background: var(--gold); border-color: var(--gold); }
+.tl-title { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--cream); }
+.tl-sub { font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.05em; color: var(--cream-dim); margin-top: 2px; }
+.tl-date { font-family: 'Josefin Sans', sans-serif; font-size: 0.6rem; color: var(--gold-dim); margin-top: 4px; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📚</div>
+      <div>
+        <div class="brand-name">Book Bank</div>
+        <div class="brand-sub">Academic Library</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-name">Dr. Admin</div>
+      <div class="user-role">Head Librarian</div>
+      <div class="role-badge">Administrator</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Overview</div>
+      <a href="dashboard.html"><span class="nav-icon">⬡</span> Dashboard</a>
+      <div class="nav-section-title">Catalogue</div>
+      <a href="books.html"><span class="nav-icon">📖</span> Books <span class="nav-badge">1248</span></a>
+      <a href="students.html"><span class="nav-icon">🎓</span> Students</a>
+      <div class="nav-section-title">Transactions</div>
+      <a href="issue.html"><span class="nav-icon">↗</span> Issue Books</a>
+      <a href="reservations.html" class="active"><span class="nav-icon">◷</span> Reservations <span class="nav-badge">7</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html">⬡ &nbsp; Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="page-header fade-up fade-up-1">
+      <div>
+        <div class="page-subtitle">Transactions</div>
+        <h1 class="page-title">Book <em>Reservations</em></h1>
+        <div class="page-date js-date"></div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-add-res')">+ New Reservation</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid fade-up fade-up-2" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem">
+      <div class="stat-card">
+        <span class="stat-icon">◷</span>
+        <div class="stat-value" data-count="7">0</div>
+        <div class="stat-label">Active Reservations</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✓</span>
+        <div class="stat-value" data-count="42">0</div>
+        <div class="stat-label">Fulfilled This Month</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✕</span>
+        <div class="stat-value" data-count="3">0</div>
+        <div class="stat-label">Cancelled</div>
+      </div>
+    </div>
+
+    <div class="content-grid wide fade-up fade-up-3">
+
+      <!-- Reservation Cards -->
+      <div>
+        <div style="font-family:'Josefin Sans',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:1rem">Active Reservations</div>
+        <div class="reservation-grid" id="res-grid"></div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Queue <span class="accent">Timeline</span></div>
+        </div>
+        <div class="card-body">
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-dot filled"></div>
+              <div class="tl-title">Lumena U → Networks</div>
+              <div class="tl-sub">Reservation confirmed · Waiting</div>
+              <div class="tl-date">Reserved: Jan 20, 2026</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot filled"></div>
+              <div class="tl-title">Divya M → AI: Russell</div>
+              <div class="tl-sub">Queue position: 1st</div>
+              <div class="tl-date">Reserved: Jan 22, 2026</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot filled"></div>
+              <div class="tl-title">Arjun K → Compiler Design</div>
+              <div class="tl-sub">Book becomes available Mar 5</div>
+              <div class="tl-date">Reserved: Jan 28, 2026</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-title">Priya S → Machine Learning</div>
+              <div class="tl-sub">Awaiting book return</div>
+              <div class="tl-date">Reserved: Feb 02, 2026</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-title">Rajan K → OS Concepts</div>
+              <div class="tl-sub">Queue position: 2nd</div>
+              <div class="tl-date">Reserved: Feb 10, 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- All reservations table -->
+    <div class="card fade-up fade-up-4" style="margin-top:1.5rem">
+      <div class="card-header">
+        <div class="card-title">All <span class="accent">Reservations</span></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Res. ID</th>
+              <th>Student</th>
+              <th>Book</th>
+              <th>Reserved Date</th>
+              <th>Expected Availability</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>RES-001</td>
+              <td>Lumena U</td>
+              <td>Computer Networks</td>
+              <td>Jan 20, 2026</td>
+              <td>Mar 05, 2026</td>
+              <td><span class="badge badge-reserved">Waiting</span></td>
+              <td><button class="btn btn-danger btn-sm" onclick="showToast('Reservation cancelled','RES-001','✕')">Cancel</button></td>
+            </tr>
+            <tr>
+              <td>RES-002</td>
+              <td>Divya M</td>
+              <td>AI: Russell & Norvig</td>
+              <td>Jan 22, 2026</td>
+              <td>Mar 10, 2026</td>
+              <td><span class="badge badge-reserved">Waiting</span></td>
+              <td><button class="btn btn-danger btn-sm" onclick="showToast('Reservation cancelled','RES-002','✕')">Cancel</button></td>
+            </tr>
+            <tr>
+              <td>RES-003</td>
+              <td>Arjun Kumar R</td>
+              <td>Compiler Design</td>
+              <td>Jan 28, 2026</td>
+              <td>Mar 08, 2026</td>
+              <td><span class="badge badge-reserved">Waiting</span></td>
+              <td><button class="btn btn-danger btn-sm" onclick="showToast('Reservation cancelled','RES-003','✕')">Cancel</button></td>
+            </tr>
+            <tr>
+              <td>RES-004</td>
+              <td>Priya S</td>
+              <td>Machine Learning</td>
+              <td>Feb 02, 2026</td>
+              <td>Mar 15, 2026</td>
+              <td><span class="badge badge-reserved">Waiting</span></td>
+              <td><button class="btn btn-primary btn-sm" onclick="showToast('Book issued from reservation','RES-004 fulfilled','✦')">Issue Now</button></td>
+            </tr>
+            <tr>
+              <td>RES-005</td>
+              <td>Rajan K</td>
+              <td>OS Concepts</td>
+              <td>Feb 10, 2026</td>
+              <td>Mar 20, 2026</td>
+              <td><span class="badge badge-reserved">Waiting</span></td>
+              <td><button class="btn btn-danger btn-sm" onclick="showToast('Reservation cancelled','RES-005','✕')">Cancel</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD RESERVATION MODAL -->
+<div class="modal-overlay" id="modal-add-res">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">New Reservation</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-res')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Student ID</label>
+      <input class="form-control" type="text" placeholder="Enter student ID">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Book ID</label>
+      <input class="form-control" type="text" placeholder="Enter book ID">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Book Name</label>
+      <input class="form-control" type="text" placeholder="Book title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Reservation Date</label>
+      <input class="form-control" type="date">
+    </div>
+    <div style="display:flex;gap:0.75rem;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-res')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-add-res');showToast('Reservation created','Student will be notified','◷')">Reserve</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon">✦</span>
+  <div>
+    <div class="toast-msg">Done</div>
+    <div class="toast-sub"></div>
+  </div>
+</div>
+
+<script src="js/shared.js"></script>
+<script>
+const reservations = [
+  { id:'RES-001', resId:'RES-2026-001', student:'Lumena U', book:'Computer Networks', date:'Jan 20, 2026', avail:'Mar 05, 2026' },
+  { id:'RES-002', resId:'RES-2026-002', student:'Divya M', book:'AI: Russell & Norvig', date:'Jan 22, 2026', avail:'Mar 10, 2026' },
+  { id:'RES-003', resId:'RES-2026-003', student:'Arjun Kumar R', book:'Compiler Design', date:'Jan 28, 2026', avail:'Mar 08, 2026' },
+  { id:'RES-004', resId:'RES-2026-004', student:'Priya S', book:'Machine Learning', date:'Feb 02, 2026', avail:'Mar 15, 2026' },
+  { id:'RES-005', resId:'RES-2026-005', student:'Rajan K', book:'OS Concepts', date:'Feb 10, 2026', avail:'Mar 20, 2026' },
+  { id:'RES-006', resId:'RES-2026-006', student:'Mahesh Bharathi K', book:'Discrete Mathematics', date:'Feb 14, 2026', avail:'Mar 25, 2026' },
+  { id:'RES-007', resId:'RES-2026-007', student:'Levea Deroshen S', book:'Computer Organization', date:'Feb 18, 2026', avail:'Apr 01, 2026' },
+];
+
+const accentColors = ['#a09de8','#7aaee8','#4cad7e','#c9a84c','#d08060','#a09de8','#7aaee8'];
+
+function renderReservations() {
+  const grid = document.getElementById('res-grid');
+  reservations.forEach((r, i) => {
+    const col = accentColors[i % accentColors.length];
+    const div = document.createElement('div');
+    div.className = 'res-card';
+    div.style.animationDelay = (i * 0.06) + 's';
+    div.innerHTML = `
+      <div class="res-card-top">
+        <div class="res-id">${r.resId}</div>
+        <span class="badge badge-reserved">Reserved</span>
+      </div>
+      <div class="res-body">
+        <div class="res-field">
+          <span class="res-field-lbl">Student</span>
+          <span class="res-field-val">${r.student}</span>
+        </div>
+        <div class="res-field">
+          <span class="res-field-lbl">Book</span>
+          <span class="res-field-val" style="font-style:italic;max-width:160px;text-align:right">${r.book}</span>
+        </div>
+        <div class="res-field">
+          <span class="res-field-lbl">Reserved On</span>
+          <span class="res-field-val">${r.date}</span>
+        </div>
+        <div class="res-field">
+          <span class="res-field-lbl">Est. Available</span>
+          <span class="res-field-val" style="color:${col}">${r.avail}</span>
+        </div>
+      </div>
+      <div class="res-actions">
+        <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('Book issued','${r.student} — ${r.book}','✦')">Issue Now</button>
+        <button class="btn btn-danger btn-sm" onclick="showToast('Reservation cancelled','${r.resId} removed','✕')">Cancel</button>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+renderReservations();
+</script>
+</body>
+</html>

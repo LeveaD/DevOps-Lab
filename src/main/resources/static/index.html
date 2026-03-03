@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book Bank — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #080c18;
+  --navy-2: #0e1525;
+  --navy-3: #141c30;
+  --navy-4: #1c2640;
+  --gold: #c9a84c;
+  --gold-light: #e8c96a;
+  --gold-dim: #8a6f30;
+  --cream: #f5eed8;
+  --cream-dim: #c8bfa5;
+  --border: rgba(201,168,76,0.2);
+  --border-strong: rgba(201,168,76,0.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body {
+  background: var(--navy);
+  color: var(--cream);
+  font-family: 'Crimson Text', Georgia, serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 50%, rgba(201,168,76,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 50%, rgba(14,21,37,0.8) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Grid lines */
+.grid-bg {
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+.login-container {
+  display: grid;
+  grid-template-columns: 1fr 440px;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Left panel */
+.login-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 5rem;
+  position: relative;
+  overflow: hidden;
+}
+.login-hero::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--gold-dim) 30%, var(--gold-dim) 70%, transparent);
+}
+
+.hero-eyebrow {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--gold);
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 5vw, 5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--cream);
+  margin-bottom: 0.5rem;
+}
+.hero-title em {
+  display: block;
+  font-style: italic;
+  color: var(--gold);
+  font-weight: 400;
+  font-size: 0.75em;
+}
+
+.hero-desc {
+  font-size: 1.1rem;
+  color: var(--cream-dim);
+  max-width: 400px;
+  margin: 1.5rem 0 3rem;
+  line-height: 1.8;
+}
+
+/* Stats row on hero */
+.hero-stats {
+  display: flex;
+  gap: 3rem;
+}
+.hero-stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+.hero-stat-lbl {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+}
+
+/* Big decorative number */
+.hero-deco {
+  position: absolute;
+  bottom: -2rem; right: 5%;
+  font-family: 'Playfair Display', serif;
+  font-size: 22rem;
+  font-weight: 900;
+  color: rgba(201,168,76,0.03);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Floating book icons */
+.float-books {
+  position: absolute;
+  top: 10%; right: 5%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0.35;
+}
+.float-book {
+  height: 14px;
+  border-radius: 2px 3px 3px 2px;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+  animation: floatBook 4s ease-in-out infinite;
+}
+.float-book:nth-child(odd) { animation-direction: alternate; }
+@keyframes floatBook {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Right panel — form */
+.login-form-panel {
+  background: var(--navy-2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2.5rem;
+}
+
+.form-logo {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.form-logo .logo-icon {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 30px rgba(201,168,76,0.3);
+  animation: pulse-gold 3s infinite;
+}
+@keyframes pulse-gold {
+  0%,100% { box-shadow: 0 8px 30px rgba(201,168,76,0.3); }
+  50% { box-shadow: 0 8px 40px rgba(201,168,76,0.5); }
+}
+.form-logo h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cream);
+}
+.form-logo p {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 4px;
+}
+
+/* Role tabs */
+.role-tabs {
+  display: flex;
+  background: var(--navy-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+.role-tab {
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  transition: all 0.3s;
+}
+.role-tab.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  color: var(--navy);
+  font-weight: 600;
+}
+
+/* Form */
+.form-card { width: 100%; }
+.form-group { margin-bottom: 1.3rem; }
+.form-label {
+  display: block;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 0.5rem;
+}
+.input-wrap { position: relative; }
+.input-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold-dim);
+  font-size: 1rem;
+  pointer-events: none;
+}
+.form-control {
+  width: 100%;
+  background: var(--navy-3);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 8px;
+  padding: 0.75rem 1rem 0.75rem 2.6rem;
+  color: var(--cream);
+  font-family: 'Crimson Text', serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+}
+.form-control::placeholder { color: rgba(197,188,168,0.35); }
+
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.82rem;
+}
+.remember-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--cream-dim);
+  cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+}
+.remember-wrap input[type=checkbox] { accent-color: var(--gold); }
+.forgot-link {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: var(--gold-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.forgot-link:hover { color: var(--gold); }
+
+.btn-login {
+  width: 100%;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  border: none;
+  border-radius: 10px;
+  color: var(--navy);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-login::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+}
+.btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.5); }
+.btn-login:active { transform: translateY(0); }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.2rem 0;
+  color: var(--gold-dim);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.demo-creds {
+  background: rgba(201,168,76,0.06);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+}
+.demo-creds p {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  color: var(--cream-dim);
+  margin-bottom: 0.4rem;
+}
+.demo-creds strong { color: var(--gold); }
+.demo-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--gold-dim);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+}
+.demo-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ornament lines */
+.form-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  color: var(--gold-dim);
+  font-size: 0.7rem;
+  opacity: 0.5;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.login-hero > * {
+  animation: fadeUp 0.7s ease forwards;
+}
+.hero-eyebrow { animation-delay: 0.1s; }
+.hero-title { animation-delay: 0.2s; }
+.hero-desc { animation-delay: 0.3s; }
+.hero-stats { animation-delay: 0.4s; }
+.login-form-panel > * {
+  animation: fadeUp 0.5s ease 0.2s forwards;
+  opacity: 0;
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<div class="login-container">
+  <!-- HERO SIDE -->
+  <div class="login-hero">
+    <div class="hero-eyebrow">Book Bank Management System</div>
+    <h1 class="hero-title">
+      The Library
+      <em>Reimagined</em>
+    </h1>
+    <p class="hero-desc">
+      A sophisticated digital platform for managing book issues, reservations, and student records — designed for the modern academic institution.
+    </p>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val">1,248</div>
+        <div class="hero-stat-lbl">Books Available</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">342</div>
+        <div class="hero-stat-lbl">Active Students</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">86</div>
+        <div class="hero-stat-lbl">Issued Today</div>
+      </div>
+    </div>
+
+    <!-- Decorative books -->
+    <div class="float-books">
+      <div class="float-book" style="width:55px;background:#c9a84c;animation-duration:3.2s"></div>
+      <div class="float-book" style="width:40px;background:#6a7fa0;animation-duration:4.1s"></div>
+      <div class="float-book" style="width:65px;background:#8a5c3a;animation-duration:3.7s"></div>
+      <div class="float-book" style="width:45px;background:#4c7a6a;animation-duration:2.9s"></div>
+      <div class="float-book" style="width:58px;background:#8a6f30;animation-duration:4.5s"></div>
+      <div class="float-book" style="width:36px;background:#6a5080;animation-duration:3.4s"></div>
+      <div class="float-book" style="width:70px;background:#c9a84c;animation-duration:5s"></div>
+    </div>
+
+    <div class="hero-deco">§</div>
+  </div>
+
+  <!-- FORM SIDE -->
+  <div class="login-form-panel">
+    <div class="form-logo">
+      <div class="logo-icon">📚</div>
+      <h2>Welcome Back</h2>
+      <p>Book Bank · Academic Library</p>
+    </div>
+
+    <!-- Role tabs -->
+    <div class="role-tabs">
+      <div class="role-tab active" id="tab-admin" onclick="switchRole('admin')">⚙ Librarian</div>
+      <div class="role-tab" id="tab-student" onclick="switchRole('student')">🎓 Student</div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-group">
+        <label class="form-label">User ID / Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">◈</span>
+          <input class="form-control" id="inp-user" type="text" placeholder="Enter your ID" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">⬡</span>
+          <input class="form-control" id="inp-pass" type="password" placeholder="••••••••">
+        </div>
+      </div>
+      <div class="form-footer">
+        <label class="remember-wrap">
+          <input type="checkbox"> Remember me
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Sign In to Book Bank</button>
+
+      <div class="divider">Demo Credentials</div>
+
+      <div class="demo-creds">
+        <p>Librarian: <strong>admin</strong> / <strong>admin123</strong></p>
+        <p>Student: <strong>student1</strong> / <strong>pass123</strong></p>
+        <button class="demo-btn" onclick="fillDemo()">Auto-fill Demo</button>
+      </div>
+    </div>
+
+    <div class="form-ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+  </div>
+</div>
+
+<script>
+let activeRole = 'admin';
+
+function switchRole(role) {
+  activeRole = role;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + role).classList.add('active');
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pass').value = '';
+}
+
+function fillDemo() {
+  if (activeRole === 'admin') {
+    document.getElementById('inp-user').value = 'admin';
+    document.getElementById('inp-pass').value = 'admin123';
+  } else {
+    document.getElementById('inp-user').value = 'student1';
+    document.getElementById('inp-pass').value = 'pass123';
+  }
+}
+
+function doLogin() {
+  const u = document.getElementById('inp-user').value;
+  const p = document.getElementById('inp-pass').value;
+  if (!u || !p) {
+    document.getElementById('inp-user').style.borderColor = 'rgba(201,76,76,0.6)';
+    return;
+  }
+  // Redirect based on role
+  if (activeRole === 'admin') {
+    window.location.href = 'dashboard.html';
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+}
+</script>
+</body>
+</html>
