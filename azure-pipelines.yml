@@ -1,0 +1,11 @@
+trigger:
+- devopsteam
+
+pool:
+  name: self-hosted-pool
+
+steps:
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'package'
