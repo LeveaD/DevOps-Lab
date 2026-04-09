@@ -5,7 +5,5 @@ pool:
   name: self-hosted-pool
 
 steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    goals: 'package'
+- script: echo "Pipeline is working successfully!"
+  displayName: 'Test Pipeline'
