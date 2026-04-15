@@ -1,13 +1,16 @@
 trigger:
 - main
+
 pool: test
+
+steps:
 - task: Maven@3
-inputs:
-mavenPomFile: 'pom.xml'
-mavenOptions: '-Xmx3072m'
-javaHomeOption: 'Path'
-jdkDirectory: 'C:\Program Files\jdk-21.0.7'
-jdkArchitectureOption: 'x64'
-publishJUnitResults: true
-testResultsFiles: '**/surefire-reports/TEST-*.xml'
-goals: 'compile'
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'Path'
+    jdkDirectory: 'C:\Program Files\jdk-21.0.7'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    goals: 'compile'
